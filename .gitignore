@@ -28,4 +28,4 @@ __pycache__/
 
 !.env_example
 
-.env
+/models

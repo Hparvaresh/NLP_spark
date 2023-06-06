@@ -10,6 +10,7 @@ from utils.read_conf import (
     PostgressUSERNAME,
     PostgressPASSWORD,
     PostgressPORT,
+    PostgressTABLE,
     JARDRV,
     RAM_LIMIT
 )
@@ -93,14 +94,16 @@ class spark_Conn():
         self.DB_HOST = f"jdbc:postgresql://{PostgressHOST}/"
         self.DB_USER = PostgressUSERNAME
         self.DB_PASS = PostgressPASSWORD
-        self.spark = SparkSession.builder.config('spark.driver.extraClassPath', JARDRV).config(
-            "spark.driver.memory", RAM_LIMIT).getOrCreate()
+        self.DB_TABLE = PostgressTABLE
+        self.spark = SparkSession.builder.config('spark.driver.extraClassPath', JARDRV) \
+            .config("spark.jars.packages", "com.johnsnowlabs.nlp:spark-nlp_2.12:4.2.4")\
+            .config( "spark.driver.memory", RAM_LIMIT).getOrCreate()
         self.connections = {}
 
-    def __call__(self, input_table):
+    def read_table(self):
         return self.spark.read.format("jdbc")\
             .option("url", self.DB_HOST)\
-            .option("dbtable", input_table)\
+            .option("dbtable", self.DB_TABLE)\
             .option("user", self.DB_USER)\
             .option("password", self.DB_PASS)\
             .option("driver", "org.postgresql.Driver")\

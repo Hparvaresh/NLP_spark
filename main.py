@@ -1,5 +1,6 @@
 from insert_data_pg import InsertDataPG
-from regex_spark import FindRegexColumn
+from NLP_funcs import FindRegexColumn, ExtractNER
 
 InsertDataPG()
 FindRegexColumn()
+ExtractNER()

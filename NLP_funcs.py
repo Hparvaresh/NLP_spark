@@ -1,6 +1,7 @@
 import os
 import re
 import json
+from utils.NER import NER
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 from utils.postgress_conn import SingletonSparkConn
@@ -12,7 +13,7 @@ from utils.read_conf import (
 def FindRegexColumn():
     res_dict = {}
     spark = SingletonSparkConn.get()
-    df = spark("test_table")
+    df = spark.read_table()
     df.show()
     regex = '(https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-Z0-9]+\\.[^\\s]{2,})|(\\{(?:[^{}]|())*\\})|(^\\s*(?:\\+?(\\d{1,3}))?[-. (]*(\\d{3})[-. )]*(\\d{3})[-. ]*(\\d{4})(?: *x(\\d+))?\\s*$)'
     cols_to_dop_mix = []
@@ -43,5 +44,14 @@ def FindRegexColumn():
     print("cols that have regex : " , cols_to_dop_mix)
 
 
+def ExtractNER():
+    spark = SingletonSparkConn.get()
+    ner = NER()
+    df = spark.read_table()
+    df = ner(df)
+    df.show()
+
+
 if __name__ == "__main__":
     FindRegexColumn()
+    ExtractNER()
